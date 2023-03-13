@@ -1,7 +1,9 @@
-from constants import IS_STORE_DATA, IS_STORE_ROLLING_METRICS, IS_ANALYSE_METRICS
+from constants import IS_STORE_DATA, IS_STORE_ROLLING_METRICS, IS_ANALYSE_METRICS, IS_MACHINE_LEARNING
 from func_exchange import store_data
 from func_stats import store_rolling_metrics
-from func_charts import plot_histogram, plot_line_chart
+from func_charts import plot_histogram, plot_multiaxis_line_chart
+from func_mlearn import train_model
+from func_utils import clean_infs
 import pandas as pd
 
 # ENTRYPOINT
@@ -24,12 +26,15 @@ if __name__ == "__main__":
 
     # Plot charts
     if IS_ANALYSE_METRICS:
-        spreads = df["spread"].values
+        spreads = clean_infs(df["spread"].values)
         plot_histogram(spreads, "spread-hist")
-        plot_line_chart(df)
+
+        pvals = clean_infs(df["coint_p_value"].values)
+        plot_multiaxis_line_chart(spreads, "spread", pvals, "pvalue")
 
     # Get HMM States (volatility and returns)
-    # if HMM_STATES:
+    if IS_MACHINE_LEARNING:
+        train_model(df)
 
     # Get HMM Switching Data
 
