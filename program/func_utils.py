@@ -8,19 +8,23 @@ def format_time(timestamp):
 
 
 # Get ISO Times
-def get_ISO_times():
+def get_ISO_times(is_predictions=False):
 
   # Confirm count of exchange data pulls needed
   # This is because DYDX limits each data pull to x100 candles
   periods = 0
-  if PERIOD == "1YEAR":
-    periods = int((365 * 24) / 100) + 1
-  elif PERIOD == "6MONTH":
-    periods = int((183 * 24) / 100) + 1
+  if not is_predictions:
+    if PERIOD == "1YEAR":
+      periods = int((365 * 24) / 100) + 1
+    elif PERIOD == "6MONTH":
+      periods = int((183 * 24) / 100) + 1
+    else:
+      # Defaults to 1 year
+      periods = int((365 * 24) / 100) + 1
+  
+  # Get just the last 300 data points for making predictions
   else:
-    # Defaults to 1 year
-    periods = int((365 * 24) / 100) + 1
-
+    periods = 1
 
   # Initialize timestamp
   date_end = datetime.now()

@@ -120,6 +120,7 @@ def store_rolling_metrics():
     df.to_csv("data/combined_metrics.csv")
     print(df)
     del(df)
+
   except Exception as e:
     print("Error: ", e)
     exit(1)

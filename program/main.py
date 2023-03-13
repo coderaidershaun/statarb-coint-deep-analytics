@@ -1,8 +1,9 @@
-from constants import IS_STORE_DATA, IS_STORE_ROLLING_METRICS, IS_ANALYSE_METRICS, IS_MACHINE_LEARNING
-from func_exchange import store_data
+from constants import IS_STORE_DATA, IS_STORE_ROLLING_METRICS, IS_ANALYSE_METRICS, IS_MACHINE_LEARNING, IS_PREDICTIONS
+from func_exchange import store_data, get_dydx_historical_ohlc_data
 from func_stats import store_rolling_metrics
 from func_charts import plot_histogram, plot_multiaxis_line_chart
-from func_mlearn import train_model
+from func_mltrain import train_model
+from func_mlpredict import make_predictions
 from func_utils import clean_infs
 import pandas as pd
 
@@ -32,12 +33,10 @@ if __name__ == "__main__":
         pvals = clean_infs(df["coint_p_value"].values)
         plot_multiaxis_line_chart(spreads, "spread", pvals, "pvalue")
 
-    # Get HMM States (volatility and returns)
+    # Train Machine Learning Model
     if IS_MACHINE_LEARNING:
         train_model(df)
 
-    # Get HMM Switching Data
-
-    # Construct Kalman Filters
-
-    # 
+    # Get Predictions for recent data
+    if IS_PREDICTIONS:
+        make_predictions()

@@ -7,12 +7,12 @@
 IS_STORE_DATA = False
 IS_STORE_ROLLING_METRICS = False
 IS_ANALYSE_METRICS = False
-IS_MACHINE_LEARNING = True
+IS_MACHINE_LEARNING = False
+IS_PREDICTIONS = True
 
 # FIXED ITEMS
 # Changes to these would require changes to code
 RESOLUTION = "1HOUR"
-EXCHANGE = "dydx"
 
 # VARIABLE ITEMS
 # Change these to change how the code behaves

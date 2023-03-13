@@ -1,7 +1,7 @@
 from dydx3.constants import API_HOST_MAINNET
 from dydx3 import Client
 
-from constants import EXCHANGE, RESOLUTION, TICKER_1, TICKER_2
+from constants import RESOLUTION, TICKER_1, TICKER_2
 from func_utils import get_ISO_times
 from decouple import config
 from web3 import Web3
@@ -80,35 +80,60 @@ def store_data():
     # Get Data
     prices_1 = []
     prices_2 = []
-    if EXCHANGE == "dydx":
 
-        # Get first ticker price history
-        prices_1 = get_dydx_historical_ohlc_data(TICKER_1, ISO_TIMES)
+    # Get first ticker price history
+    prices_1 = get_dydx_historical_ohlc_data(TICKER_1, ISO_TIMES)
 
-        # Store price1 history
-        if len(prices_1) > 0:
-            df_1 = pd.DataFrame(prices_1)
-            df_1.set_index("datetime", inplace=True)
-            df_1.to_csv("data/ticker_1.csv")
+    # Store price1 history
+    if len(prices_1) > 0:
+        df_1 = pd.DataFrame(prices_1)
+        df_1.set_index("datetime", inplace=True)
+        df_1.to_csv("data/ticker_1.csv")
 
-        # Get second ticker price history
-        prices_2 = get_dydx_historical_ohlc_data(TICKER_2, ISO_TIMES)
+    # Get second ticker price history
+    prices_2 = get_dydx_historical_ohlc_data(TICKER_2, ISO_TIMES)
 
-        # Store price2 history
-        if len(prices_2) > 0:
-            df_2 = pd.DataFrame(prices_2)
-            df_2.set_index("datetime", inplace=True)
-            df_2.to_csv("data/ticker_2.csv")
+    # Store price2 history
+    if len(prices_2) > 0:
+        df_2 = pd.DataFrame(prices_2)
+        df_2.set_index("datetime", inplace=True)
+        df_2.to_csv("data/ticker_2.csv")
 
-        # Merge Data, Save Data, Clear from  Memory
-        if len(df_1) == len(df_2):
-            df_merge = pd.merge(df_1, df_2, left_index=True, right_index=True)
-            df_merge.to_csv("data/combined.csv")
-            print(df_merge)
-            del(df_1)
-            del(df_2)
-            del(df_merge)
-        else:
-            print("Error: Ticker data not same length")
-            exit(1)
+    # Merge Data, Save Data, Clear from  Memory
+    if len(df_1) == len(df_2):
+        df_merge = pd.merge(df_1, df_2, left_index=True, right_index=True)
+        df_merge.to_csv("data/combined.csv")
+        print(df_merge)
+        del(df_1)
+        del(df_2)
+        del(df_merge)
+    else:
+        print("Error: Ticker data not same length")
+        exit(1)
 
+
+# Get current data
+def get_current_dydx_data():
+    ISO_TIMES = get_ISO_times(is_predictions=True)
+
+    # Get dataset - ticker 1
+    prices_1 = get_dydx_historical_ohlc_data(TICKER_1, ISO_TIMES)
+    df_1 = pd.DataFrame(prices_1)
+    df_1.set_index("datetime", inplace=True)
+
+    # Get dataset - ticker 2
+    prices_2 = get_dydx_historical_ohlc_data(TICKER_2, ISO_TIMES)
+    df_2 = pd.DataFrame(prices_2)
+    df_2.set_index("datetime", inplace=True)
+
+    # Merge dataframes
+    if len(df_1) == len(df_2) and len(df_1) > 0:
+        df_merge= pd.merge(df_1, df_2, left_index=True, right_index=True)
+        del(df_1)
+        del(df_2)
+        return df_merge
+    
+    # Handle Length Error
+    else:
+        print("Error: Data not fully retrieved and matching in length")
+        exit(1)

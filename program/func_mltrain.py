@@ -13,11 +13,12 @@ from pprint import pprint
 def train_model(df):
 
   # Define columns
-  # 'z_score', 'spread_volatility', f"{TICKER_1}_volatility", f"{TICKER_2}_volatility", 'coint_p_value', , f"{TICKER_1}_range", f"{TICKER_2}_range", 'corr',
-  X_data_columns = ['spread', 'ticker_1_rets', 'ticker_2_rets', 'spread_rets']
+  # 'z_score', 'spread_volatility', f"{TICKER_1}_volatility", f"{TICKER_2}_volatility", 'coint_p_value', , f"{TICKER_1}_range", f"{TICKER_2}_range", 'corr', 'spread_rets'
+  X_data_columns = ['spread', 'ticker_1_rets', 'ticker_2_rets']
 
-  # Keep relevant columns
-  df = df[X_data_columns]
+  # Keep relevant columns and ignore last 300 rows of data
+  # We will get the most recent 300 rows later on to ensure the model stands true
+  df = df[X_data_columns].iloc[:-300,:]
 
   # Add Targets
   df.loc[df["spread"].shift(-1) > df["spread"], "TARGET"] = 1
@@ -26,8 +27,6 @@ def train_model(df):
   # Drop NA
   df.dropna(inplace=True)
   df.replace([np.inf, -np.inf], np.nan, inplace=True)
-
-  print(df)
 
   # Define X_Data
   X_data = df.iloc[:, :-1]
@@ -107,6 +106,7 @@ def train_model(df):
   print("Test Precision %: ", round(test_summary_report["1.0"]["precision"], 5) * 100)
   print("")
 
+  # Print Summary
   pprint(test_summary_report)
 
   # Save model
