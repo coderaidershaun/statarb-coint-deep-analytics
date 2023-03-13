@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from constants import PERIOD, WINDOW
+from constants import PERIOD, WINDOW, OOS_SIZE
 
 
 # Format time
@@ -24,7 +24,7 @@ def get_ISO_times(is_predictions=False):
   
   # Get just the last 300 data points for making predictions
   else:
-    periods = 1
+    periods = int(OOS_SIZE / 100)
 
   # Initialize timestamp
   date_end = datetime.now()

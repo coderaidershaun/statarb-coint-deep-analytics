@@ -64,3 +64,7 @@ def make_predictions():
   df.loc[df["PRED"] != df["ACTUAL"], "CORRECT"] = 0
   acc_perc = df["CORRECT"].sum() / len(df)
   print(f"Accuracy: {round(acc_perc * 100, 1)}%")
+
+  # Save File
+  df.to_csv("test.csv")
+  print("Predictions saved")

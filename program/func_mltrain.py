@@ -1,4 +1,4 @@
-from constants import TICKER_1, TICKER_2
+from constants import TICKER_1, TICKER_2, OOS_SIZE
 from sklearn.model_selection import train_test_split, cross_val_score, RepeatedStratifiedKFold
 from sklearn.metrics import classification_report
 from xgboost import XGBClassifier, plot_tree
@@ -13,14 +13,15 @@ from pprint import pprint
 def train_model(df):
 
   # Define columns
-  # 'z_score', 'spread_volatility', f"{TICKER_1}_volatility", f"{TICKER_2}_volatility", 'coint_p_value', , f"{TICKER_1}_range", f"{TICKER_2}_range", 'corr', 'spread_rets'
-  X_data_columns = ['spread', 'ticker_1_rets', 'ticker_2_rets']
+  # 'z_score', 'spread', 'ticker_1_rets', 'ticker_2_rets'
+  X_data_columns = ['spread', 'ticker_1_rets', 'ticker_2_rets', 'z_score', 'spread_volatility', f"{TICKER_1}_volatility", f"{TICKER_2}_volatility", 
+                    'coint_p_value', f"{TICKER_1}_range", f"{TICKER_2}_range", 'corr', 'spread_rets']
 
   # Keep relevant columns and ignore last 300 rows of data
   # We will get the most recent 300 rows later on to ensure the model stands true
-  df = df[X_data_columns].iloc[:-300,:]
+  df = df[X_data_columns].iloc[:-OOS_SIZE,:]
 
-  # Add Targets
+  # Add Targets - predict future sum of rets to be positive
   df.loc[df["spread"].shift(-1) > df["spread"], "TARGET"] = 1
   df.loc[df["spread"].shift(-1) <= df["spread"], "TARGET"] = 0
 
@@ -123,17 +124,17 @@ def train_model(df):
   # plot_tree(classifier, num_trees=0)
   # plt.show()
 
-  # # Other useful plots
-  # training_results = classifier.evals_result()
-  # validation_0_error = training_results['validation_0'][eval_metric_list[0]]
-  # validation_1_error = training_results['validation_1'][eval_metric_list[0]]
-  # validation_0_logloss = training_results['validation_0'][eval_metric_list[1]]
-  # validation_1_logloss = training_results['validation_1'][eval_metric_list[1]]
-  # validation_0_auc = training_results['validation_0'][eval_metric_list[2]]
-  # validation_1_auc = training_results['validation_1'][eval_metric_list[2]]
+  # Other useful plots
+  training_results = classifier.evals_result()
+  validation_0_error = training_results['validation_0'][eval_metric_list[0]]
+  validation_1_error = training_results['validation_1'][eval_metric_list[0]]
+  validation_0_logloss = training_results['validation_0'][eval_metric_list[1]]
+  validation_1_logloss = training_results['validation_1'][eval_metric_list[1]]
+  validation_0_auc = training_results['validation_0'][eval_metric_list[2]]
+  validation_1_auc = training_results['validation_1'][eval_metric_list[2]]
 
-  # # Plots
-  # plt.title('Error')
-  # plt.plot(validation_0_error)
-  # plt.plot(validation_1_error)
-  # plt.show()
+  # Plots
+  plt.title('Error')
+  plt.plot(validation_0_error)
+  plt.plot(validation_1_error)
+  plt.show()
